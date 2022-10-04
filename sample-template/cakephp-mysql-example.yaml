@@ -1,0 +1,39 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: my-template
+objects:
+  - kind: BuildConfig
+    apiVersion: v1
+    metadata:
+      name: cakephp-mysql-example
+      annotations:
+        description: Defines how to build the application
+    spec:
+      source:
+        type: Git
+        git:
+          uri: "${SOURCE_REPOSITORY_URL}" 1
+          ref: "${SOURCE_REPOSITORY_REF}"
+        contextDir: "${CONTEXT_DIR}"
+  - kind: DeploymentConfig
+    apiVersion: v1
+    metadata:
+      name: frontend
+    spec:
+      replicas: "${{REPLICA_COUNT}}" 2
+parameters:
+  - name: SOURCE_REPOSITORY_URL 3
+    displayName: Source Repository URL 4
+    description: The URL of the repository with your application source code 5
+    value: https://github.com/sclorg/cakephp-ex.git 6
+    required: true 7
+  - name: GITHUB_WEBHOOK_SECRET
+    description: A secret string used to configure the GitHub webhook
+    generate: expression 8
+    from: "[a-zA-Z0-9]{40}" 9
+  - name: REPLICA_COUNT
+    description: Number of replicas to run
+    value: "2"
+    required: true
+message: "... The GitHub webhook secret is ${GITHUB_WEBHOOK_SECRET} ..."
